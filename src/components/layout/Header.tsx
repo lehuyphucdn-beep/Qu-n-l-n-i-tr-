@@ -1,17 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
   Bell,
-  UserCheck,
-  ShieldAlert,
-  Search,
-  CheckCircle2,
-  Clock,
-  Sparkles,
-  ChevronDown,
   Moon,
   Sun,
-  X,
-  Users,
   LogIn,
 } from 'lucide-react';
 import { BOPSStore, subscribeToStore } from '../../services/storage';
@@ -39,7 +30,6 @@ export const Header: React.FC<HeaderProps> = ({
   const [allUsers, setAllUsers] = useState<User[]>(BOPSStore.getUsers());
   const [notifications, setNotifications] = useState(BOPSStore.getNotifications());
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
-  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   useEffect(() => {
@@ -54,11 +44,6 @@ export const Header: React.FC<HeaderProps> = ({
   const unreadCount = notifications.filter(
     (n) => !n.read && (n.receiverId === currentUser.id || n.receiverId === currentUser.role || n.receiverId === 'all')
   ).length;
-
-  const handleSelectUser = (user: User) => {
-    BOPSStore.setCurrentUser(user.id);
-    setShowRoleDropdown(false);
-  };
 
   const currentDisplayTime = new Date().toLocaleTimeString('vi-VN', {
     hour: '2-digit',
@@ -99,98 +84,15 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Right: Login Button, Role Switcher, Notifications, Dark Mode */}
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Login / Account Switch Button */}
+        {/* Login Button */}
         <button
           onClick={() => setIsLoginModalOpen(true)}
-          className="hidden sm:flex items-center gap-1.5 rounded-xl bg-blue-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-blue-700 transition"
-          title="Đăng nhập tài khoản GVQN / Quản lý"
+          className="flex items-center gap-1.5 rounded-xl bg-blue-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-blue-700 transition"
+          title="Đăng nhập tài khoản"
         >
-          <LogIn className="h-3.5 w-3.5" />
-          <span>Đăng Nhập GVQN</span>
+          <LogIn className="h-4 w-4" />
+          <span>Đăng nhập</span>
         </button>
-
-        {/* Quick Role Switcher Badge */}
-        <div className="relative">
-          <button
-            onClick={() => setShowRoleDropdown(!showRoleDropdown)}
-            className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-750"
-          >
-            <img
-              src={currentUser.avatar}
-              alt={currentUser.fullName}
-              className="h-6 w-6 rounded-full object-cover ring-2 ring-blue-500/30"
-            />
-            <div className="text-left hidden md:block">
-              <div className="font-semibold leading-tight text-slate-900 dark:text-white">
-                {currentUser.fullName}
-              </div>
-              <div className="text-[10px] text-slate-500 dark:text-slate-400">
-                {currentUser.role === 'manager' ? ' Trưởng Bộ phận' : ` ${currentUser.teacherCode}`}
-              </div>
-            </div>
-            <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
-          </button>
-
-          {/* User Switcher Dropdown */}
-          {showRoleDropdown && (
-            <div className="absolute right-0 mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl dark:border-slate-700 dark:bg-slate-900 z-50">
-              <div className="px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <span>Chuyển tài khoản thử nghiệm</span>
-                <Users className="h-3.5 w-3.5" />
-              </div>
-
-              <div className="max-h-72 overflow-y-auto py-1">
-                <div className="px-2 py-1 text-[11px] font-bold text-blue-600 dark:text-blue-400 uppercase">
-                  Quản lý
-                </div>
-                {allUsers
-                  .filter((u) => u.role === 'manager')
-                  .map((u) => (
-                    <button
-                      key={u.id}
-                      onClick={() => handleSelectUser(u)}
-                      className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-xs transition ${
-                        u.id === currentUser.id
-                          ? 'bg-blue-50 font-semibold text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
-                          : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
-                      }`}
-                    >
-                      <img src={u.avatar} alt={u.fullName} className="h-7 w-7 rounded-full object-cover" />
-                      <div>
-                        <div className="font-medium">{u.fullName}</div>
-                        <div className="text-[10px] text-slate-400">{u.position}</div>
-                      </div>
-                    </button>
-                  ))}
-
-                <div className="mt-2 px-2 py-1 text-[11px] font-bold text-slate-500 uppercase">
-                  Giáo viên Quản nhiệm (23)
-                </div>
-                {allUsers
-                  .filter((u) => u.role === 'teacher')
-                  .map((u) => (
-                    <button
-                      key={u.id}
-                      onClick={() => handleSelectUser(u)}
-                      className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-xs transition ${
-                        u.id === currentUser.id
-                          ? 'bg-blue-50 font-semibold text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
-                          : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
-                      }`}
-                    >
-                      <img src={u.avatar} alt={u.fullName} className="h-7 w-7 rounded-full object-cover" />
-                      <div>
-                        <div className="font-medium">
-                          {u.fullName} <span className="text-[10px] font-normal text-slate-400">({u.teacherCode})</span>
-                        </div>
-                        <div className="text-[10px] text-slate-400">{u.position}</div>
-                      </div>
-                    </button>
-                  ))}
-              </div>
-            </div>
-          )}
-        </div>
 
         {/* Notifications */}
         <div className="relative">
